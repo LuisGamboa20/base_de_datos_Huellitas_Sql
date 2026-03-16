@@ -1,0 +1,50 @@
+-- Preparacion de datos necesarios para que las consultas arrojen resultados visuales
+INSERT INTO diseno (id_diseno, nombre_diseno, rango_tallas, id_maestro_creador) 
+VALUES (3, 'Mocasín Ejecutivo', '38-42', 3);
+
+INSERT INTO lote_produccion (id_lote_produccion, cantidad_zapatos, tiempo_estimado_horas, id_diseno) 
+VALUES (300, 3, 12, 3);
+
+INSERT INTO zapato (id_zapato, id_lote_produccion, id_maestro_ensamblador, id_ayudante_preparador, id_molde, id_suela) 
+VALUES (21, 300, 2, 5, 1, 1), (22, 300, 2, 5, 1, 1), (23, 300, 2, 5, 1, 1);
+
+INSERT INTO trozo (id_trozo, id_material, id_cortador) 
+VALUES (1, 2, 6), (2, 2, 6);
+
+INSERT INTO zapato_trozo (id_zapato, id_trozo) 
+VALUES (21, 1), (21, 2);
+
+
+-- Realizar una consulta que permita conocer en que zapatos fue usado determinado molde.
+SELECT 
+    z.id_zapato, 
+    d.nombre_diseno,
+    z.id_molde
+FROM zapato z
+JOIN lote_produccion lp ON z.id_lote_produccion = lp.id_lote_produccion
+JOIN diseno d ON lp.id_diseno = d.id_diseno
+WHERE z.id_molde = 1;
+
+
+-- Realizar una consulta que permita conocer que lotes de material fueron usados en la construcción de un zapato.
+SELECT DISTINCT 
+    li.id_lote AS lote_origen_material, 
+    m.nombre_material,
+    li.fecha_recepcion
+FROM zapato z
+JOIN zapato_trozo zt ON z.id_zapato = zt.id_zapato
+JOIN trozo t ON zt.id_trozo = t.id_trozo
+JOIN material m ON t.id_material = m.id_material
+JOIN lote_insumo li ON m.id_lote = li.id_lote
+WHERE z.id_zapato = 21;
+
+
+-- Realizar un consulta que permita conocer cuanto zapatos se crearon para un diseño determinado.
+SELECT 
+    d.nombre_diseno, 
+    COUNT(z.id_zapato) AS total_zapatos_creados
+FROM diseno d
+JOIN lote_produccion lp ON d.id_diseno = lp.id_diseno
+JOIN zapato z ON lp.id_lote_produccion = z.id_lote_produccion
+WHERE d.id_diseno = 3
+GROUP BY d.id_diseno, d.nombre_diseno;

@@ -1,0 +1,41 @@
+-- 1. Actualizar un diseño agregando un trozo de un material diferente [cite: 48]
+-- ==========================================
+-- A. Primero registramos el nuevo material en el inventario
+INSERT INTO material (id_material, nombre_material, color, id_lote) 
+VALUES (2, 'Tela Transpirable', 'Negro', 1);
+
+-- B. Vinculamos este material al diseño 1, indicando que usará 1 trozo
+INSERT INTO diseno_material (id_diseno, id_material, cantidad_trozos) 
+VALUES (1, 2, 1);
+
+-- ==========================================
+-- 2. Eliminar un zapato de un lote [cite: 49]
+-- ==========================================
+-- Vamos a eliminar el zapato número 10 que pertenece al lote 100
+DELETE FROM zapato 
+WHERE id_zapato = 10 AND id_lote_produccion = 100;
+
+-- ==========================================
+-- 3. Eliminar un diseño que ya tenga un lote de 10 (ahora 9) zapatos 
+-- ==========================================
+-- Para que MySQL nos deje borrar el diseño 1, debemos borrar la cadena hacia atrás (en cascada manual):
+DELETE FROM zapato WHERE id_lote_produccion = 100;          -- Borramos los zapatos
+DELETE FROM lote_produccion WHERE id_diseno = 1;            -- Borramos el lote
+DELETE FROM diseno_accesorio WHERE id_diseno = 1;           -- Quitamos su relación con accesorios
+DELETE FROM diseno_material WHERE id_diseno = 1;            -- Quitamos su relación con materiales
+DELETE FROM diseno WHERE id_diseno = 1;                     -- ¡Ahora sí borramos el diseño!
+
+-- ==========================================
+-- 4. Insertar nuevo accesorio y luego un diseño que lo use [cite: 51]
+-- ==========================================
+-- A. Insertamos el nuevo accesorio
+INSERT INTO accesorio (id_accesorio, nombre_accesorio, id_lote) 
+VALUES (2, 'Broche Metálico', 1);
+
+-- B. Insertamos el nuevo diseño (Usando al maestro Luis, id_empleado = 3)
+INSERT INTO diseno (id_diseno, nombre_diseno, rango_tallas, id_maestro_creador) 
+VALUES (2, 'Bota Industrial', '38-44', 3);
+
+-- C. Vinculamos el accesorio al nuevo diseño
+INSERT INTO diseno_accesorio (id_diseno, id_accesorio) 
+VALUES (2, 2);
